@@ -26,7 +26,9 @@ export const SocketProvider = ({ children }) => {
       return;
     }
 
-    const socket = io('http://localhost:5000', {
+    const SOCKET_URL = import.meta.env.PROD ? undefined : 'http://localhost:5000';
+    
+    const socket = io(SOCKET_URL, {
       auth: { token: user.token },
       reconnection: true,
       reconnectionAttempts: 10,

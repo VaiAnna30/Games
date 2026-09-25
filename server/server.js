@@ -51,10 +51,23 @@ app.delete('/api/rooms/:roomKey', auth, deleteRoom);
 // === MESSAGE ROUTES ===
 app.get('/api/messages/:roomId', auth, getMessages);
 
-// Health check
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Serve static assets in production
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../client/dist')));
+
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../client/dist', 'index.html'));
+  });
+} else {
+  // Health check in dev
+  app.get('/', (req, res) => res.send('API Running'));
+}
 
 // Connect to MongoDB & start server
 const PORT = process.env.PORT || 5000;
